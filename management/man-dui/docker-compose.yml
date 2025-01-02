@@ -1,0 +1,41 @@
+name: "man-dui"
+
+services:
+  portainer:
+    image: portainer/portainer-ce:2.21.5-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PORT_VOL_DATA}:/data/
+    networks:
+      public:
+        ipv4_address: ${PORT_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.portainer.entrypoints=web-external"
+      - "traefik.http.routers.portainer.rule=Host(`${PORT_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.portainer-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.portainer-secure.rule=Host(`${PORT_UI_ADDRESS}`)"
+      - "traefik.http.routers.portainer-secure.tls=true"
+
+      # ui service config
+      - "traefik.http.routers.portainer-secure.service=portainer-ui-svc"
+      - "traefik.http.services.portainer-ui-svc.loadbalancer.server.port=9000"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
