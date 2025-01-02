@@ -4,3 +4,6 @@
 
 # environment variables
 **/*.env
+
+# ignore updates
+setup/*
