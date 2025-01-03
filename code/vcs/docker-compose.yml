@@ -38,8 +38,6 @@ services:
     networks:
       public:
         ipv4_address: ${GITEA_PUBLIC_IPV4}
-    # ports:
-    #   - ${HOST_SSH_PORT}:22
     labels:
       # enable traefik
       - "traefik.enable=true"
