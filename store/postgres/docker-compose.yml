@@ -1,0 +1,32 @@
+name: "st-db-postgres"
+
+services:
+  postgres:
+    image: postgres:17.2-alpine3.21
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - PUID=${UID}
+      - PGID=${GID}
+      - LANG=${PG_LANG}
+      - POSTGRES_DATABASE=${PG_DATABASE}
+      - POSTGRES_USER=${PG_ADMIN_USER}
+      - POSTGRES_PASSWORD=${PG_ADMIN_PASSWORD}
+      - POSTGRES_INITDB_ARGS=${PG_INITDB_ARGS}
+      # - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES} # enabled by init-script
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${PG_VOL_DATA}:/var/lib/postgresql/data/
+      # - ${PG_INIT_SCRIPT_PATH}:/docker-entrypoint-initdb.d/ # provide custom init-script
+    networks:
+      store:
+        ipv4_address: ${PG_STORE_IPV4}
+    ports:
+      - ${HOST_PG_PORT}:5432
+
+networks:
+  store:
+    name: ${NET_STORE}
+    external: true
