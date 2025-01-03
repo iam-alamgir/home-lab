@@ -1,0 +1,53 @@
+name: "code-qc"
+
+services:
+  sonarqube:
+    image: sonarqube:9.9.8-community
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - SONAR_JDBC_URL=${SONAR_JDBC_URL}
+      - SONAR_JDBC_USERNAME=${SONAR_JDBC_USERNAME}
+      - SONAR_JDBC_PASSWORD=${SONAR_JDBC_PASSWORD}
+      - SONAR_JDBC_MAXACTIVE=${SONAR_JDBC_MAXACTIVE}
+      - SONAR_JDBC_MINIDLE=${SONAR_JDBC_MINIDLE}
+      - SONAR_JDBC_MAXWAIT=${SONAR_JDBC_MAXWAIT}
+      - SONAR_UPDATECENTER_ACTIVATE=${SONAR_UPDATECENTER_ACTIVATE}
+      - SONAR_LOG_LEVEL=${SONAR_LOG_LEVEL}
+      - SONAR_LOG_ROLLINGPOLICY=${SONAR_LOG_ROLLINGPOLICY}
+      - SONAR_LOG_MAXFILES=${SONAR_LOG_MAXFILES}
+      - SONAR_TELEMETRY_ENABLE=${SONAR_TELEMETRY_ENABLE}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${SONAR_VOL_DATA}:/opt/sonarqube/data/
+      - ${SONAR_VOL_LOGS}:/opt/sonarqube/logs/
+      - ${SONAR_VOL_EXT}:/opt/sonarqube/extensions/
+    networks:
+      public:
+        ipv4_address: ${SONAR_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.sonarqube.entrypoints=web"
+      - "traefik.http.routers.sonarqube.rule=Host(`${SONAR_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.sonarqube-secure.entrypoints=web-secure"
+      - "traefik.http.routers.sonarqube-secure.rule=Host(`${SONAR_UI_ADDRESS}`)"
+      - "traefik.http.routers.sonarqube-secure.tls=true"
+
+      # service config
+      - "traefik.http.routers.sonarqube-secure.service=sonar-svc"
+      - "traefik.http.services.sonar-svc.loadbalancer.server.port=9000"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
