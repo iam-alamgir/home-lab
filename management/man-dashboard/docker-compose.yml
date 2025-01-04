@@ -1,0 +1,79 @@
+name: "man-dashboard"
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v0.10.7
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - PUID=${UID}
+      - PGID=${GID}
+      - HOMEPAGE_VAR_PORTAINER_ACCESS_TOKEN=${HP_PORTAINER_ACCESS_TOKEN}
+      - HOMEPAGE_VAR_GRAFANA_USER=${HP_GRAFANA_USER}
+      - HOMEPAGE_VAR_GRAFANA_PASS=${HP_GRAFANA_PASS}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${HP_VOL_CONF}:/app/config/
+      - ${HP_VOL_IMAGE}:/app/public/images/
+    networks:
+      public:
+        ipv4_address: ${HP_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.homepage.entrypoints=web"
+      - "traefik.http.routers.homepage.rule=Host(`${HP_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.homepage-secure.entrypoints=web-secure"
+      - "traefik.http.routers.homepage-secure.rule=Host(`${HP_UI_ADDRESS}`)"
+      - "traefik.http.routers.homepage-secure.tls=true"
+
+      # service config
+      - "traefik.http.routers.homepage-secure.service=hp-svc"
+      - "traefik.http.services.hp-svc.loadbalancer.server.port=3000"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+  uptime:
+    image: louislam/uptime-kuma:1.23.16-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${UPTIME_VOL_DATA}:/app/data/
+    networks:
+      public:
+        ipv4_address: ${UPTIME_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.uptime.entrypoints=web"
+      - "traefik.http.routers.uptime.rule=Host(`${UPTIME_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.uptime-secure.entrypoints=web-secure"
+      - "traefik.http.routers.uptime-secure.rule=Host(`${UPTIME_UI_ADDRESS}`)"
+      - "traefik.http.routers.uptime-secure.tls=true"
+
+      # service config
+      - "traefik.http.routers.uptime-secure.service=uptime-svc"
+      - "traefik.http.services.uptime-svc.loadbalancer.server.port=3001"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
