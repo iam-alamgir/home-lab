@@ -1,0 +1,43 @@
+name: "man-vault"
+
+services:
+  vault:
+    image: vaultwarden/server:1.32.7-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - DATABASE_URL=${VAULT_DB_URL}
+      - ADMIN_TOKEN=${VAULT_ADMIN_TOKEN}
+      - SHOW_PASSWORD_HINT=${VAULT_SHOW_PASS_HINT}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${VAULT_VOL_DATA}:/data/
+    networks:
+      public:
+        ipv4_address: ${VAULT_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.vault.entrypoints=web"
+      - "traefik.http.routers.vault.rule=Host(`${VAULT_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.vault-secure.entrypoints=web-secure"
+      - "traefik.http.routers.vault-secure.rule=Host(`${VAULT_UI_ADDRESS}`)"
+      - "traefik.http.routers.vault-secure.tls=true"
+
+      # service config
+      - "traefik.http.routers.vault-secure.service=vault-svc"
+      - "traefik.http.services.vault-svc.loadbalancer.server.port=80"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
