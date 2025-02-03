@@ -16,7 +16,7 @@ services:
       - CLOUDFLARE_PROPAGATION_TIMEOUT=${TRAEFIK_PROPAGATION_TIMEOUT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
       - ${TRAEFIK_VOL_CONF}:/etc/traefik/
       - ${TRAEFIK_VOL_LOGS}:/var/log/traefik/
     networks:
