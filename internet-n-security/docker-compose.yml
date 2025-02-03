@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    privileged: true
     environment:
       - TZ=${TZ}
       - PUID=${UID}
