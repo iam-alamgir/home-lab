@@ -20,6 +20,8 @@ services:
     networks:
       public:
         ipv4_address: ${VAULT_PUBLIC_IPV4}
+      store:
+        ipv4_address: ${VAULT_STORE_IPV4}
     labels:
       # enable traefik
       - "traefik.enable=true"
@@ -43,4 +45,7 @@ services:
 networks:
   public:
     name: ${NET_PUBLIC}
+    external: true
+  store:
+    name: ${NET_STORE}
     external: true
