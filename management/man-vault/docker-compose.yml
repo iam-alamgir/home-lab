@@ -22,11 +22,11 @@ services:
       - "traefik.enable=true"
 
       # http config
-      - "traefik.http.routers.vault.entrypoints=web"
+      - "traefik.http.routers.vault.entrypoints=web-external"
       - "traefik.http.routers.vault.rule=Host(`${VAULT_UI_ADDRESS}`)"
 
       # https config
-      - "traefik.http.routers.vault-secure.entrypoints=web-secure"
+      - "traefik.http.routers.vault-secure.entrypoints=web-secure-external"
       - "traefik.http.routers.vault-secure.rule=Host(`${VAULT_UI_ADDRESS}`)"
       - "traefik.http.routers.vault-secure.tls=true"
 
