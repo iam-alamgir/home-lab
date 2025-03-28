@@ -23,8 +23,6 @@ services:
     networks:
       store:
         ipv4_address: ${PG_STORE_IPV4}
-    ports:
-      - ${HOST_PG_PORT}:5432
 
 networks:
   store:
