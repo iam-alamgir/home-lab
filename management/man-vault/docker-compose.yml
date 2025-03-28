@@ -2,7 +2,7 @@ name: "man-vault"
 
 services:
   vault:
-    image: vaultwarden/server:1.32.7-alpine
+    image: vaultwarden/server:1.33.2-alpine
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
