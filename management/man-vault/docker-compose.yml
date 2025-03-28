@@ -8,8 +8,11 @@ services:
       - no-new-privileges:true
     environment:
       - TZ=${TZ}
+      - DOMAIN=${VAULT_DOMAIN}
       - DATABASE_URL=${VAULT_DB_URL}
       - ADMIN_TOKEN=${VAULT_ADMIN_TOKEN}
+      - WEBSOCKET_ENABLED=${VAULT_WEBSOCKET_ENABLED}
+      - SIGNUPS_ALLOWED=${VAULT_SIGNUPS_ALLOWED}
       - SHOW_PASSWORD_HINT=${VAULT_SHOW_PASS_HINT}
     volumes:
       - /etc/localtime:/etc/localtime:ro
