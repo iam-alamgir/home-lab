@@ -2,7 +2,7 @@ name: "is-proxy"
 
 services:
   traefik:
-    image: traefik:3.3.3
+    image: traefik:3.3.4
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -61,7 +61,7 @@ services:
       - "traefik.docker.network=${NET_PROXY}"
 
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.6.4-slim
+    image: crowdsecurity/crowdsec:v1.6.8-slim
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -106,7 +106,7 @@ services:
       - "traefik.docker.network=${NET_PROXY}"
 
   cf-tunnel:
-    image: cloudflare/cloudflared:2025.1.1
+    image: cloudflare/cloudflared:2025.2.1
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
