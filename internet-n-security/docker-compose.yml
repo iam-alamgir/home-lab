@@ -32,9 +32,6 @@ services:
       - ${HOST_HTTPS_PORT}:443
       - ${HOST_HTTP_PORT_EXTERNAL}:8089
       - ${HOST_HTTPS_PORT_EXTERNAL}:4439
-    depends_on:
-      crowdsec:
-        condition: service_healthy
 
   pangolin-client:
     image: fosrl/newt
