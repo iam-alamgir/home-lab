@@ -1,0 +1,20 @@
+= Home Lab Setup
+
+link:https://podman.io[image:https://img.shields.io/badge/platform-podman-892CA0.svg?style=for-the-badge&logo=podman[Platform]]
+link:https://vcs.alamgir.pro/private/home-lab/-/blob/main/LICENSE[image:https://img.shields.io/badge/license-Apache%202.0-D22128.svg?style=for-the-badge&logo=apache[License]]
+
+Configured With::
+- https://podman.io[Podman] and https://github.com/containers/podman-compose[Podman Compose] for provisioning.
+- https://www.portainer.io[Portainer] for easier management.
+- rename .env.template to .env and add values
+
+Services::
+    Internet & Security:::
+        - https://cloudflare.com[Cloudflare Tunnel]
+        - https://traefik.io/traefik[Traefik]
+    Management:::
+        - https://www.portainer.io[Portainer]
+
+Copyright&copy; 2025 https://alamgir.pro[Alamgir Hossain]
+
+This software is licensed under Apache 2.0 LICENSE.
