@@ -1,0 +1,19 @@
+name: "is-cf-tunnel"
+
+services:
+  cf-tunnel:
+    image: docker.io/cloudflare/cloudflared:2025.6.0
+    container_name: ${CF_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+    networks:
+      proxy:
+        ipv4_address: ${CF_PROXY_IPV4}
+    command: "tunnel --no-autoupdate run"
+
+networks:
+  proxy:
+    name: ${NET_PROXY}
+    external: true
