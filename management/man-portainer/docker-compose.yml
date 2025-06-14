@@ -3,7 +3,7 @@ name: "man-portainer"
 services:
   portainer:
     image: docker.io/portainer/portainer-ce:2.31.0-alpine
-    container_name: ${PORT_CONTAINER_NAME:-portainer}
+    container_name: ${PORT_CONTAINER_NAME-portainer}
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true

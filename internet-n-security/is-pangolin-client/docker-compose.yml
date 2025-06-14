@@ -3,7 +3,7 @@ name: "is-pangolin-client"
 services:
   pangolin-client:
     image: docker.io/fosrl/newt:1.2.1
-    container_name: ${PANGC_CONTAINER_NAME:-pangolin-client}
+    container_name: ${PANGC_CONTAINER_NAME-pangolin-client}
     restart: unless-stopped
     security_opt:
       - no-new-privileges
