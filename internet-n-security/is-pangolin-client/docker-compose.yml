@@ -1,0 +1,21 @@
+name: "is-pangolin-client"
+
+services:
+  pangolin-client:
+    image: fosrl/newt:1.2.1
+    container_name: ${PANGC_CONTAINER_NAME:-pangolin-client}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges
+    environment:
+      - PANGOLIN_ENDPOINT=${PANGC_ENDPOINT}
+      - NEWT_ID=${PANGC_CLIENT_ID}
+      - NEWT_SECRET=${PANGC_CLIENT_SECRET}
+    networks:
+      proxy:
+        ipv4_address: ${PANGC_PROXY_IPV4}
+
+networks:
+  proxy:
+    name: ${NET_PROXY}
+    external: true
