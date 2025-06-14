@@ -3,7 +3,7 @@ name: "is-proxy"
 services:
   crowdsec:
     image: docker.io/crowdsecurity/crowdsec:v1.6.8-slim
-    container_name: ${CROWDSEC_CONTAINER_NAME:-crowdsec}
+    container_name: ${CROWDSEC_CONTAINER_NAME-crowdsec}
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -32,7 +32,7 @@ services:
 
   traefik:
     image: docker.io/library/traefik:3.4.1
-    container_name: ${TRAEFIK_CONTAINER_NAME:-traefik}
+    container_name: ${TRAEFIK_CONTAINER_NAME-traefik}
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
