@@ -1,9 +1,38 @@
-name: "is-traefik"
+name: "is-proxy"
 
 services:
+  crowdsec:
+    image: docker.io/crowdsecurity/crowdsec:v1.6.8-slim
+    container_name: ${CROWDSEC_CONTAINER_NAME:-crowdsec}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      interval: 10s
+      retries: 15
+      timeout: 10s
+      test: ["CMD", "cscli", "capi", "status"]
+    environment:
+      - TZ=${TZ}
+      - GID=${GID}
+      - COLLECTIONS=${CROWDSEC_COLLECTIONS}
+      - PARSERS=${CROWDSEC_PARSERS}
+      - ENROLL_INSTANCE_NAME=${CROWDSEC_ENROLL_NAME}
+      - ENROLL_TAGS=${CROWDSEC_ENROLL_TAGS}
+    volumes:
+      - ${CROWDSEC_VOL_CONF}:/etc/crowdsec
+      - ${CROWDSEC_VOL_DB}:/var/lib/crowdsec/data
+      - ${TRAEFIK_VOL_LOGS}:/var/log/traefik:ro
+    networks:
+      proxy:
+        ipv4_address: ${CROWDSEC_PROXY_IPV4}
+    command: -t
+    labels:
+      - "traefik.enable=false"
+
   traefik:
     image: docker.io/library/traefik:3.4.1
-    container_name: ${TRAEFIK_CONTAINER_NAME}
+    container_name: ${TRAEFIK_CONTAINER_NAME:-traefik}
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -20,6 +49,7 @@ services:
       - ${TRAEFIK_VOL_STATIC_CONF}:/etc/traefik/traefik_conf.yml:ro
       - ${TRAEFIK_VOL_DYNAMIC_CONF}:/etc/traefik/dynamic_conf/:ro
       - ${TRAEFIK_VOL_ACME}:/etc/traefik/acme.json:rw
+      - ${TRAEFIK_VOL_LOGS}:/var/log/traefik:rw
     networks:
       proxy:
         ipv4_address: ${TRAEFIK_PROXY_IPV4}
@@ -36,6 +66,9 @@ services:
       - ${HOST_HTTPS_PORT_EXTERNAL}:4439
     command:
       - --configFile=/etc/traefik/traefik_conf.yml
+    depends_on:
+      crowdsec:
+        condition: service_healthy
     labels:
       # enable traefik
       - "traefik.enable=true"
