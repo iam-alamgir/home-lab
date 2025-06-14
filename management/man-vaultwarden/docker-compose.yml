@@ -1,0 +1,60 @@
+name: "man-vaultwarden"
+
+services:
+  vaultwarden:
+    image: docker.io/vaultwarden/server:1.34.1-alpine
+    container_name: ${VAULT_CONTAINER_NAME-vaultwarden}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - DOMAIN=${VAULT_DOMAIN}
+      - DATABASE_URL=${VAULT_DB_URL}
+      - ADMIN_TOKEN=${VAULT_ADMIN_TOKEN}
+      - WEBSOCKET_ENABLED=${VAULT_WEBSOCKET_ENABLED}
+      - SIGNUPS_ALLOWED=${VAULT_SIGNUPS_ALLOWED}
+      - SHOW_PASSWORD_HINT=${VAULT_SHOW_PASS_HINT}
+      - SMTP_HOST=${VAULT_SMTP_HOST}
+      - SMTP_FROM=${VAULT_SMTP_FROM}
+      - SMTP_FROM_NAME=${VAULT_SMTP_FROM_NAME}
+      - SMTP_PORT=${VAULT_SMTP_PORT}
+      - SMTP_SECURITY=${VAULT_SMTP_SECURITY}
+      - SMTP_USERNAME=${VAULT_SMTP_USERNAME}
+      - SMTP_PASSWORD=${VAULT_SMTP_PASSWORD}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${VAULT_VOL_DATA}:/data/
+    networks:
+      public:
+        ipv4_address: ${VAULT_PUBLIC_IPV4}
+      store:
+        ipv4_address: ${VAULT_STORE_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.vault.entrypoints=web-external"
+      - "traefik.http.routers.vault.rule=Host(`${VAULT_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.vault-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.vault-secure.middlewares=vaultwarden-security@file"
+      - "traefik.http.routers.vault-secure.rule=Host(`${VAULT_UI_ADDRESS}`)"
+      - "traefik.http.routers.vault-secure.tls=true"
+
+      # service config
+      - "traefik.http.routers.vault-secure.service=vault-svc"
+      - "traefik.http.services.vault-svc.loadbalancer.server.port=80"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
+  store:
+    name: ${NET_STORE}
+    external: true
