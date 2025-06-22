@@ -1,0 +1,109 @@
+name: "man-zitadel"
+
+services:
+  zitadel:
+    image: ghcr.io/zitadel/zitadel:v3.3.0
+    container_name: ${ZITADEL_CONTAINER_NAME-zitadel}
+    user: '$UID'
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "/app/zitadel", "ready"]
+      interval: '10s'
+      timeout: '5s'
+      retries: 5
+      start_period: '10s'
+    environment:
+      - TZ=${TZ}
+      - ZITADEL_EXTERNALDOMAIN=${ZITADEL_EXTERNAL_DOMAIN}
+      - ZITADEL_PORT=${ZITADEL_PORT}
+      - ZITADEL_EXTERNALPORT=${ZITADEL_EXTERNAL_PORT}
+      - ZITADEL_EXTERNALSECURE=${ZITADEL_EXTERNAL_SECURE}
+      - ZITADEL_TLS_ENABLED=${ZITADEL_TLS_ENABLED}
+      - ZITADEL_FIRSTINSTANCE_ORG_NAME=${ZITADEL_FI_NAME}
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME=${ZITADEL_FI_USERNAME}
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=${ZITADEL_FI_PASSWORD}
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=${ZITADEL_FI_PASSWORDCHANGE_REQUIRED}
+      - ZITADEL_MACHINE_IDENTIFICATION_PRIVATEIP_ENABLED=${ZITADEL_MID_PRIVATE_IP_ENABLED}
+      - ZITADEL_MACHINE_IDENTIFICATION_HOSTNAME_ENABLED=${ZITADEL_MID_HOSTNAEME_ENABLED}
+      - ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_ENABLED=${ZITADEL_MID_WEBHOOK_ENABLED}
+      - ZITADEL_DATABASE_POSTGRES_HOST=${ZITADEL_PG_HOST}
+      - ZITADEL_DATABASE_POSTGRES_PORT=${ZITADEL_PG_PORT}
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=${ZITADEL_PG_DATABASE}
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=${ZITADEL_PG_USER}
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=${ZITADEL_PG_PASSWORD}
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=${ZITADEL_PG_SSL_MODE}
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=${ZITADEL_PG_ADMIN_USER}
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=${ZITADEL_PG_ADMIN_PASSWORD}
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=${ZITADEL_PG_ADMIN_SSL_MODE}
+    networks:
+      public:
+        ipv4_address: ${ZITADEL_PUBLIC_IPV4}
+      store:
+        ipv4_address: ${ZITADEL_STORE_IPV4}
+    command: 'start-from-setup --init-projections --masterkey "${ZITADEL_MASTER_KEY}" --tlsMode external'
+    depends_on:
+      zitadel-init:
+        condition: service_completed_successfully
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.zitadel.entrypoints=web-external"
+      - "traefik.http.routers.zitadel.rule=Host(`${ZITADEL_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.zitadel-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.zitadel-secure.rule=Host(`${ZITADEL_UI_ADDRESS}`)"
+      - "traefik.http.routers.zitadel-secure.tls=true"
+
+      # ui service config
+      - "traefik.http.routers.zitadel-secure.service=zitadel-svc"
+      - "traefik.http.services.zitadel-svc.loadbalancer.server.port=8080"
+      - "traefik.http.services.zitadel-svc.loadbalancer.server.scheme=h2c"
+      - "traefik.http.services.zitadel-svc.loadbalancer.passHostHeader=true"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+  zitadel-init:
+    image: ghcr.io/zitadel/zitadel:v3.3.0
+    user: '$UID'
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - ZITADEL_EXTERNALDOMAIN=${ZITADEL_EXTERNAL_DOMAIN}
+      - ZITADEL_PORT=${ZITADEL_PORT}
+      - ZITADEL_EXTERNALPORT=${ZITADEL_EXTERNAL_PORT}
+      - ZITADEL_EXTERNALSECURE=${ZITADEL_EXTERNAL_SECURE}
+      - ZITADEL_TLS_ENABLED=${ZITADEL_TLS_ENABLED}
+      - ZITADEL_FIRSTINSTANCE_ORG_NAME=${ZITADEL_FI_NAME}
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME=${ZITADEL_FI_USERNAME}
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=${ZITADEL_FI_PASSWORD}
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=${ZITADEL_FI_PASSWORDCHANGE_REQUIRED}
+      - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=${ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED}
+      - ZITADEL_DATABASE_POSTGRES_HOST=${ZITADEL_PG_HOST}
+      - ZITADEL_DATABASE_POSTGRES_PORT=${ZITADEL_PG_PORT}
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=${ZITADEL_PG_DATABASE}
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=${ZITADEL_PG_USER}
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=${ZITADEL_PG_PASSWORD}
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=${ZITADEL_PG_SSL_MODE}
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=${ZITADEL_PG_ADMIN_USER}
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=${ZITADEL_PG_ADMIN_PASSWORD}
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=${ZITADEL_PG_ADMIN_SSL_MODE}
+    networks:
+      public:
+        ipv4_address: ${ZITADEL_INIT_PUBLIC_IPV4}
+      store:
+        ipv4_address: ${ZITADEL_INIT_STORE_IPV4}
+    command: 'init'
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
+  store:
+    name: ${NET_STORE}
+    external: true
