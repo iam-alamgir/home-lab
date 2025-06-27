@@ -80,6 +80,7 @@ services:
       # https config
       - "traefik.http.routers.traefik-secure.entrypoints=web-secure"
       - "traefik.http.routers.traefik-secure.rule=Host(`${TRAEFIK_UI_ADDRESS}`)"
+      - "traefik.http.routers.traefik-secure.middlewares=oidc-auth@file"
       - "traefik.http.routers.traefik-secure.tls=true"
 
       # ui service config
