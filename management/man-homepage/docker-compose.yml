@@ -1,0 +1,48 @@
+name: "man-homepage"
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v1.3.2
+    container_name: ${HP_CONTAINER_NAME-homepage}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+      - PUID=${UID}
+      - PGID=${GID}
+      - HOMEPAGE_ALLOWED_HOSTS=${HP_UI_ADDRESS}
+      - HOMEPAGE_VAR_PORTAINER_ACCESS_TOKEN=${HP_PORTAINER_ACCESS_TOKEN}
+      - LOG_LEVEL=debug
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${HP_VOL_CONF}:/app/config/
+      - ${HP_VOL_IMG}:/app/public/images/
+    networks:
+      public:
+        ipv4_address: ${HP_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.homepage.entrypoints=web-external"
+      - "traefik.http.routers.homepage.rule=Host(`${HP_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.homepage-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.homepage-secure.rule=Host(`${HP_UI_ADDRESS}`)"
+      - "traefik.http.routers.homepage-secure.middlewares=oidc-auth@file"
+      - "traefik.http.routers.homepage-secure.tls=true"
+
+      # ui service config
+      - "traefik.http.routers.homepage-secure.service=homepage-ui-svc"
+      - "traefik.http.services.homepage-ui-svc.loadbalancer.server.port=3000"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
