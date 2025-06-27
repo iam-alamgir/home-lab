@@ -1,0 +1,39 @@
+name: "util-tools"
+
+services:
+  it-tools:
+    image: docker.io/corentinth/it-tools:2024.10.22-7ca5933
+    container_name: ${TOOLS_CONTAINER_NAME-it-tools}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=${TZ}
+    networks:
+      public:
+        ipv4_address: ${TOOLS_PUBLIC_IPV4}
+    labels:
+      # enable traefik
+      - "traefik.enable=true"
+
+      # http config
+      - "traefik.http.routers.tools.entrypoints=web-external"
+      - "traefik.http.routers.tools.rule=Host(`${TOOLS_UI_ADDRESS}`)"
+
+      # https config
+      - "traefik.http.routers.tools-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.tools-secure.rule=Host(`${TOOLS_UI_ADDRESS}`)"
+      - "traefik.http.routers.tools-secure.middlewares=oidc-auth@file"
+      - "traefik.http.routers.tools-secure.tls=true"
+
+      # ui service config
+      - "traefik.http.routers.tools-secure.service=tools-ui-svc"
+      - "traefik.http.services.tools-ui-svc.loadbalancer.server.port=80"
+
+      # network config
+      - "traefik.docker.network=${NET_PUBLIC}"
+
+networks:
+  public:
+    name: ${NET_PUBLIC}
+    external: true
