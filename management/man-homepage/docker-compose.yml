@@ -2,7 +2,7 @@ name: "man-homepage"
 
 services:
   homepage:
-    image: ghcr.io/gethomepage/homepage:v1.3.2
+    image: ghcr.io/gethomepage/homepage:v1.4.0
     container_name: ${HP_CONTAINER_NAME-homepage}
     restart: unless-stopped
     security_opt:
