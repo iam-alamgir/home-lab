@@ -2,7 +2,7 @@ name: "is-cf-tunnel"
 
 services:
   cf-tunnel:
-    image: docker.io/cloudflare/cloudflared:2025.6.1
+    image: docker.io/cloudflare/cloudflared:2025.7.0
     container_name: ${CF_CONTAINER_NAME-cf-tunnel}
     restart: unless-stopped
     environment:
