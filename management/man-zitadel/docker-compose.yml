@@ -8,12 +8,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: ["CMD", "/app/zitadel", "ready"]
-      interval: '10s'
-      timeout: '5s'
-      retries: 5
-      start_period: '10s'
     environment:
       - TZ=${TZ}
       - ZITADEL_EXTERNALDOMAIN=${ZITADEL_EXTERNAL_DOMAIN}
