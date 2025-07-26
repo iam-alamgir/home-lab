@@ -2,7 +2,7 @@ name: "is-proxy"
 
 services:
   crowdsec:
-    image: docker.io/crowdsecurity/crowdsec:v1.6.10-slim
+    image: docker.io/crowdsecurity/crowdsec:v1.6.11-slim
     container_name: ${CROWDSEC_CONTAINER_NAME-crowdsec}
     restart: unless-stopped
     security_opt:
