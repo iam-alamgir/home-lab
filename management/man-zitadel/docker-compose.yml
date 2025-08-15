@@ -2,7 +2,7 @@ name: "man-zitadel"
 
 services:
   zitadel:
-    image: ghcr.io/zitadel/zitadel:v3.3.2
+    image: ghcr.io/zitadel/zitadel:v3.3.6
     container_name: ${ZITADEL_CONTAINER_NAME-zitadel}
     user: '$UID'
     restart: unless-stopped
@@ -63,7 +63,7 @@ services:
       - "traefik.docker.network=${NET_PUBLIC}"
 
   zitadel-init:
-    image: ghcr.io/zitadel/zitadel:v3.3.2
+    image: ghcr.io/zitadel/zitadel:v3.3.6
     user: '$UID'
     security_opt:
       - no-new-privileges:true
