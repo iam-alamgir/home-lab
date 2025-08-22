@@ -12,7 +12,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /run/user/${UID}/podman/podman.sock:/var/run/docker.sock:ro
-      - ${PORT_VOL_DATA}:/data/:rw
+      - ${PORT_VOL_DATA}:/data/:z,rw
     networks:
       public:
         ipv4_address: ${PORT_PUBLIC_IPV4}

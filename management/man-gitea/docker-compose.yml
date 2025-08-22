@@ -51,7 +51,7 @@ services:
       - GITEA__database__LOG_SQL=${GITEA_DB_LOG_SQL}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${GITEA_VOL_DATA}:/data
+      - ${GITEA_VOL_DATA}:/data:z,rw
     networks:
       public:
         ipv4_address: ${GITEA_PUBLIC_IPV4}

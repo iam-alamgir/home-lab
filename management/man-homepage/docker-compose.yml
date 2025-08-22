@@ -16,8 +16,8 @@ services:
       - LOG_LEVEL=debug
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${HP_VOL_CONF}:/app/config/
-      - ${HP_VOL_IMG}:/app/public/images/
+      - ${HP_VOL_CONF}:/app/config/:z,rw
+      - ${HP_VOL_IMG}:/app/public/images/:z,rw
     networks:
       public:
         ipv4_address: ${HP_PUBLIC_IPV4}
