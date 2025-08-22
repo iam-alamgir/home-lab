@@ -24,7 +24,7 @@ services:
       - SMTP_PASSWORD=${VAULT_SMTP_PASSWORD}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${VAULT_VOL_DATA}:/data/
+      - ${VAULT_VOL_DATA}:/data/:z,rw
     networks:
       public:
         ipv4_address: ${VAULT_PUBLIC_IPV4}

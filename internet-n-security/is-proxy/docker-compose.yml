@@ -20,8 +20,9 @@ services:
       - ENROLL_INSTANCE_NAME=${CROWDSEC_ENROLL_NAME}
       - ENROLL_TAGS=${CROWDSEC_ENROLL_TAGS}
     volumes:
-      - ${CROWDSEC_VOL_CONF}:/etc/crowdsec
-      - ${CROWDSEC_VOL_DB}:/var/lib/crowdsec/data
+      - /etc/localtime:/etc/localtime:ro
+      - ${CROWDSEC_VOL_CONF}:/etc/crowdsec:rw
+      - ${CROWDSEC_VOL_DB}:/var/lib/crowdsec/data:rw
       - ${TRAEFIK_VOL_LOGS}:/var/log/traefik:ro
     networks:
       proxy:
@@ -35,7 +36,7 @@ services:
     container_name: ${TRAEFIK_CONTAINER_NAME-traefik}
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - label=disable
     environment:
       - TZ=${TZ}
       - PUID=${UID}

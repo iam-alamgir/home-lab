@@ -8,7 +8,7 @@ services:
     security_opt:
       - no-new-privileges:true
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "${PG_DATABASE}", "-U", "${PG_ADMIN_USER}"]
+      test: ["CMD-SHELL", "pg_isready -d ${PG_DATABASE} -U ${PG_ADMIN_USER}"]
       interval: '10s'
       timeout: '30s'
       retries: 5
@@ -25,7 +25,7 @@ services:
       # - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES} # enabled by init-script
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${PG_VOL_DATA}:/var/lib/postgresql/data/
+      - ${PG_VOL_DATA}:/var/lib/postgresql/data/:z,rw
       # - ${PG_INIT_SCRIPT_PATH}:/docker-entrypoint-initdb.d/ # provide custom init-script
     networks:
       store:
