@@ -32,7 +32,7 @@ services:
       - "traefik.enable=false"
 
   traefik:
-    image: docker.io/library/traefik:v3.5.0
+    image: docker.io/library/traefik:v3.5.1
     container_name: ${TRAEFIK_CONTAINER_NAME-traefik}
     restart: unless-stopped
     security_opt:
