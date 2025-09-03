@@ -2,7 +2,7 @@ name: "is-pangolin-client"
 
 services:
   pangolin-client:
-    image: docker.io/fosrl/newt:1.4.2
+    image: docker.io/fosrl/newt:1.4.4
     container_name: ${PANGC_CONTAINER_NAME-pangolin-client}
     restart: unless-stopped
     security_opt:
